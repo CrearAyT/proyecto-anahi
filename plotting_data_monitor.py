@@ -53,18 +53,22 @@ class PlottingDataMonitor(QMainWindow):
         plot.setCanvasBackground(Qt.black)
         plot.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time')
         plot.setAxisScale(Qwt.QwtPlot.xBottom, 0, 10, 1)
-        plot.setAxisTitle(Qwt.QwtPlot.yLeft, 'Temperature')
+        plot.setAxisTitle(Qwt.QwtPlot.yLeft, 'ADC')
         plot.setAxisScale(Qwt.QwtPlot.yLeft, 0, 1024, 96)
         plot.replot()
         
-        curve = Qwt.QwtPlotCurve('')
-        curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
-        pen = QPen(QColor('limegreen'))
-        pen.setWidth(2)
-        curve.setPen(pen)
-        curve.attach(plot)
+        curves = []
+        colors = 'red green magenta cyan blue yellow'.split()
+        for idx in range(0,4):
+            curve = Qwt.QwtPlotCurve('Canal %i'%idx)
+            curve.setRenderHint(Qwt.QwtPlotItem.RenderAntialiased)
+            pen = QPen(QColor(colors[idx]))
+            pen.setWidth(2)
+            curve.setPen(pen)
+            curve.attach(plot)
+            curves.append(curve)
         
-        return plot, curve
+        return plot, curves
 
     def create_thermo(self):
         thermo = Qwt.QwtThermo(self)
@@ -104,7 +108,7 @@ class PlottingDataMonitor(QMainWindow):
         
         # Plot and thermo
         #
-        self.plot, self.curve = self.create_plot()
+        self.plot, self.curves = self.create_plot()
         self.thermo = self.create_thermo()
         
         thermo_l = QLabel('Average')
@@ -273,16 +277,24 @@ class PlottingDataMonitor(QMainWindow):
             
             self.temperature_samples.append(
                 (data['timestamp'], data['temperature']))
-            if len(self.temperature_samples) > 100:
+            if len(self.temperature_samples) > 200:
                 self.temperature_samples.pop(0)
             
             xdata = [s[0] for s in self.temperature_samples]
-            ydata = [s[1] for s in self.temperature_samples]
-            
-            avg = sum(ydata) / float(len(ydata))
+# XXX FIXME: pasar a numpy y transponer
+#            ydata = [s[1] for s in self.temperature_samples]
+            ydata = [ [], [], [], [] ]
+            for r in self.temperature_samples:
+                yd = r[1]
+                for idx in range(4):
+                    ydata[idx].append(yd[idx])
+
+            avg = sum(ydata[0]) / float(len(ydata[0]))
                 
             self.plot.setAxisScale(Qwt.QwtPlot.xBottom, xdata[0], max(20, xdata[-1]))
-            self.curve.setData(xdata, ydata)
+            for idx in range(0,4):
+                self.curves[idx].setData(xdata, ydata[idx])
+                   
             self.plot.replot()
             
             self.thermo.setValue(avg)
