@@ -82,7 +82,7 @@ class ComMonitorThread(threading.Thread):
 #                timestamp = time.clock()
 #                self.data_q.put((data, timestamp))
 #
-            data = self.serial_port.readline()
+            data = self.serial_port.readline().strip()
             if len(data) > 0:
                 ch0 = int(data.split()[0])
                 timestamp = time.time() - t0
