@@ -52,10 +52,9 @@ class PlottingDataMonitor(QMainWindow):
         plot = Qwt.QwtPlot(self)
         plot.setCanvasBackground(Qt.black)
         plot.setAxisTitle(Qwt.QwtPlot.xBottom, 'Time')
-        plot.setAxisScale(Qwt.QwtPlot.xBottom, 0, 10, 1)
+        plot.setAxisScale(Qwt.QwtPlot.xBottom, 0, 20, 1)
         plot.setAxisTitle(Qwt.QwtPlot.yLeft, 'ADC')
-        plot.setAxisScale(Qwt.QwtPlot.yLeft, 0, 1024, 96)
-        plot.replot()
+        plot.setAxisScale(Qwt.QwtPlot.yLeft, 0, 1024, 128)
         
         curves = []
         colors = 'red green magenta cyan blue yellow'.split()
@@ -68,6 +67,20 @@ class PlottingDataMonitor(QMainWindow):
             curve.attach(plot)
             curves.append(curve)
         
+
+        legend = Qwt.QwtLegend()
+        legend.setItemMode(Qwt.QwtLegend.ClickableItem)
+        plot.insertLegend(legend, Qwt.QwtPlot.LeftLegend)
+
+        def toggleVisibility(plotItem):
+            """Toggle the visibility of a plot item
+            """
+            plotItem.setVisible(not plotItem.isVisible())
+            plot.replot()
+
+        plot.connect(plot, SIGNAL("legendClicked(QwtPlotItem*)"), toggleVisibility)
+
+        plot.replot()
         return plot, curves
 
     def create_thermo(self):
