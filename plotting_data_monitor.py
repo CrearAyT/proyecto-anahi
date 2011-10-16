@@ -40,6 +40,9 @@ class PlottingDataMonitor(QMainWindow):
         self.create_menu()
         self.create_main_frame()
         self.create_status_bar()
+
+        self.portname.setText('/dev/ttyACM0')
+        self.set_actions_enable_state()
         
     def make_data_box(self, name):
         label = QLabel(name)
@@ -112,12 +115,12 @@ class PlottingDataMonitor(QMainWindow):
         #
         portname_l, self.portname = self.make_data_box('COM Port:')
         
-        portname_layout = QHBoxLayout()
-        portname_layout.addWidget(portname_l)
-        portname_layout.addWidget(self.portname, 0)
-        portname_layout.addStretch(1)
-        portname_groupbox = QGroupBox('COM Port')
-        portname_groupbox.setLayout(portname_layout)
+#        portname_layout = QHBoxLayout()
+#        portname_layout.addWidget(portname_l)
+#        portname_layout.addWidget(self.portname, 0)
+#        portname_layout.addStretch(1)
+#        portname_groupbox = QGroupBox('COM Port')
+#        portname_groupbox.setLayout(portname_layout)
         
         # Plot and thermo
         #
@@ -151,7 +154,7 @@ class PlottingDataMonitor(QMainWindow):
         #
         self.main_frame = QWidget()
         main_layout = QVBoxLayout()
-        main_layout.addWidget(portname_groupbox)
+#        main_layout.addWidget(portname_groupbox)
         main_layout.addWidget(plot_groupbox)
         main_layout.addStretch(1)
         self.main_frame.setLayout(main_layout)
@@ -171,8 +174,8 @@ class PlottingDataMonitor(QMainWindow):
         exit_action = self.create_action("E&xit", slot=self.close, 
             shortcut="Ctrl+X", tip="Exit the application")
         
-        self.start_action.setEnabled(False)
-        self.stop_action.setEnabled(False)
+#        self.start_action.setEnabled(False)
+#        self.stop_action.setEnabled(False)
         
         self.add_actions(self.file_menu, 
             (   selectport_action, self.start_action, self.stop_action,
