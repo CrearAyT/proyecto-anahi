@@ -69,6 +69,9 @@ class ComMonitorThread(threading.Thread):
         # no anda en linux
         #time.clock()
         
+        # sacar basura que pueda quedar en el buffer
+        for x in range(10):
+            self.serial_port.readline()
         t0 = time.time()
         while self.alive.isSet():
             # Reading 1 byte, followed by whatever is left in the
@@ -84,9 +87,12 @@ class ComMonitorThread(threading.Thread):
 #
             data = self.serial_port.readline().strip()
             if len(data) > 0:
-                data  = [int(x) for x in data.split()]
-                timestamp = time.time() - t0
-                self.data_q.put((data, timestamp))
+                try:
+                    data  = [int(x) for x in data.split()]
+                    timestamp = time.time() - t0
+                    self.data_q.put((data, timestamp))
+                except:
+                    print 'com_err XXX data: ', data
 
             
         # clean up

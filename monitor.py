@@ -10,6 +10,8 @@ from eblib.serialutils import full_port_name, enumerate_serial_ports
 from eblib.utils import get_all_from_queue, get_item_from_queue
 from livedatafeed import LiveDataFeed
 
+import plugins
+
 DEFAULT_PORT = '/dev/ttyACM0'
 
 class DataMonitor(QMainWindow):
@@ -28,6 +30,7 @@ class DataMonitor(QMainWindow):
         hl = QHBoxLayout()
         sb = QPushButton('Iniciar')
         sb.setCheckable(True)
+        self.sb = sb
         hl.addWidget(sb)
 
         self.connect(sb, SIGNAL('toggled(bool)'), self.onoff)
@@ -38,17 +41,44 @@ class DataMonitor(QMainWindow):
         main_layout.addLayout(hl)
 
         self.modules = QListWidget()
+        self.modules.itemChanged.connect(self.mod_onoff)
         
         main_layout.addWidget(self.modules)
     
+        self.fill_plugins()
+
+
+
+    def fill_plugins(self):
+        for p in plugins.all:
+            it = QListWidgetItem(p.name)
+            it.setCheckState(Qt.Unchecked)
+            it.ob = p()
+            self.modules.addItem(it)
+
 
     def onoff(self, checked):
-        print checked
         if checked:
-            self.on_start()
+            self.sb.setChecked(self.on_start())
         else:
             self.on_stop()
 
+
+    def mod_onoff(self,item):
+        if item.checkState():
+            item.ob.start()
+        else:
+            item.ob.stop()
+
+    def on_timer(self,*args):
+        data = list(get_all_from_queue(self.data_q))
+        if (len(data)==0):
+            return
+
+        for idx in xrange(self.modules.count()):
+            plug = self.modules.item(idx)
+            if plug.checkState():
+                plug.ob.new_data(data)
 
     def on_stop(self):
         """ Stop the monitor
@@ -65,8 +95,10 @@ class DataMonitor(QMainWindow):
         """ Start the monitor: com_monitor thread and the update
             timer
         """
+
+
         if self.com_monitor is not None or self.portname.text() == '':
-            return
+            return False
         
         self.data_q = Queue.Queue()
         self.error_q = Queue.Queue()
@@ -92,6 +124,7 @@ class DataMonitor(QMainWindow):
         if update_freq > 0:
             self.timer.start(1000.0 / update_freq)
         
+        return True
 
 
 if __name__ == '__main__':
