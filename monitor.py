@@ -126,6 +126,11 @@ class DataMonitor(QMainWindow):
         
         return True
 
+    def closeEvent(self, event):
+        for idx in xrange(self.modules.count()):
+            plug = self.modules.item(idx)
+            plug.ob.destroy()
+        event.accept()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

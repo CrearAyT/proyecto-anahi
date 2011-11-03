@@ -13,4 +13,5 @@ class SinkTest(object):
     def stop(self):
         print 'sink stop'
 
-all = [SinkTest]
+    def destroy(self):
+        print 'sink destroy'
