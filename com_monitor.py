@@ -90,7 +90,7 @@ class ComMonitorThread(threading.Thread):
                 try:
                     data  = [int(x) for x in data.split()]
                     timestamp = time.time() - t0
-                    self.data_q.put((data, timestamp))
+                    self.data_q.put((timestamp, data))
                 except:
                     print 'com_err XXX data: ', data
 
