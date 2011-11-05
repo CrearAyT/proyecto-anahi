@@ -1,3 +1,5 @@
+from deriv import Deriv
+
 class SinkTest(object):
     name = 'Volcar datos a stdout'
 
@@ -24,6 +26,8 @@ class PlotTest(object):
         self.plotw = PlotWindow()
         self.plotw.add_curve('Chan 1')
         self.plotw.add_curve('Chan 2')
+        self.plotw.add_curve('Chan 3')
+        self.plotw.add_curve('Chan 4')
 
 
     def new_data(self, data, *args, **kwargs):
@@ -39,4 +43,4 @@ class PlotTest(object):
     def destroy(self):
         self.plotw.close()
 
-all = [SinkTest, PlotTest]
+all = [SinkTest, PlotTest, Deriv]
