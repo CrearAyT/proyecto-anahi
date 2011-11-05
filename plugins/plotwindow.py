@@ -84,7 +84,9 @@ class PlotWindow(QMainWindow):
 
         if len(self.samples[0]) > self.max_samples:
             for col in self.samples:
-                col.pop(0)
+            # puede pasar si agregamos menos datos que la cantidad de curvas
+                if col:
+                    col.pop(0)
         
         self.plot.setAxisScale(Qwt.QwtPlot.xBottom, self.samples[0][0], max(self._axis[1], self.samples[0][-1]))
         for idx,curve in enumerate(self._curves):
