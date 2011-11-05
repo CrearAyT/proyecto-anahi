@@ -52,6 +52,7 @@ class ComMonitorThread(threading.Thread):
 
         self.data_q = data_q
         self.error_q = error_q
+        self.invert = False
         
         self.alive = threading.Event()
         self.alive.set()
