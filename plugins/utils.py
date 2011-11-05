@@ -82,6 +82,7 @@ class adsr(object):
         else:
             self.state = 'quiet'
             self.triggered = False
+            self.lp1.y = 0
             self.on_release_cb()
             return 0
 
