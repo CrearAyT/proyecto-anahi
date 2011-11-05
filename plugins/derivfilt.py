@@ -3,7 +3,7 @@ from PyQt4.QtGui import *
 import PyQt4.Qwt5 as Qwt
 
 from plotwindow import PlotWindow
-from utils import lpfilt, diff
+from utils import lpfilt, diff, adsr
 
 class DerivFilt(QMainWindow):
     name = 'Derivada, umbral, dc filtrada'
@@ -18,11 +18,14 @@ class DerivFilt(QMainWindow):
         self.plotw.add_curve('Detectado')
         self.plotw.add_curve('Nivel DC')
         self.plotw.add_curve('Componente AC (abs)')
+        self.plotw.add_curve('ADSR')
 
         self.dx = diff()
         self.xf = lpfilt()
         self.dc = lpfilt(alfa=0.998)
         self.dxf = diff()
+
+        self.adsr = adsr()
 
         self.alfa = .5
         self.umbral = 100
@@ -75,7 +78,8 @@ class DerivFilt(QMainWindow):
             ok = 150*(abs(d)>=umb)
             dc = self.dc(x)
             ac = abs(x- dc)
-            self.plotw.add_datapoint(item[0], x, d, umb, ok, dc, ac)
+            ad = self.adsr(x)
+            self.plotw.add_datapoint(item[0], x, d, umb, ok, dc, ac, ad)
  
     def start(self):
         self.show()
