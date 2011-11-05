@@ -108,7 +108,7 @@ class DataMonitor(QMainWindow):
             full_port_name(str(self.portname.text())),
             115200)
         self.com_monitor.start()
-        
+#        self.com_monitor.invert = True 
         com_error = get_item_from_queue(self.error_q)
         if com_error is not None:
             QMessageBox.critical(self, 'ComMonitorThread error',

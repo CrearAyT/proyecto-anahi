@@ -88,7 +88,10 @@ class ComMonitorThread(threading.Thread):
             data = self.serial_port.readline().strip()
             if len(data) > 0:
                 try:
-                    data  = [int(x) for x in data.split()]
+                    if self.invert:
+                        data  = [1024 - int(x) for x in data.split()]
+                    else:
+                        data  = [int(x) for x in data.split()]
                     timestamp = time.time() - t0
                     self.data_q.put((timestamp, data))
                 except:
