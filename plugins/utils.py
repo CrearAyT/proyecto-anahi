@@ -35,6 +35,13 @@ class adsr(object):
         self.state = 'quiet' # quiet attack sustain release
         self._states = {'quiet':self._quiet, 'attack':self._attack, 'sustain':self._sustain, 'release':self._release}
 
+    def reset(self):
+        self.samplec = 0
+        self.lp1.y = 0
+        self.state = 'quiet'
+        self.triggered = False
+        self.on_release_cb()
+
     def _quiet(self, x):
         d = self.dx(x)
         ok = 150*(abs(d)>=self.umbral)
