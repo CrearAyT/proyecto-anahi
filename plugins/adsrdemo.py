@@ -69,6 +69,10 @@ class ADSRDemo(QMainWindow):
             vbox.addWidget(sld)
             self.sliders.append(sld)
 
+        b = QPushButton('Resetear ADSR')
+        b.clicked.connect(self.adsr.reset)
+        vbox.addWidget(b)
+
         vbox.addStretch(1)
 
         self.setWindowTitle('Prueba ADSR')
@@ -88,6 +92,8 @@ class ADSRDemo(QMainWindow):
     def set_param(self, value):
         (nom, lbl, attr, k, kdisp) = self.sender().params
         val = k*value
+        if attr in ['attackl','sustl', 'rell']:
+            val = int(val)
         lbl.setText(nom + ': %.3f'%(value*kdisp) )
         setattr(self.adsr, attr, val) 
 
