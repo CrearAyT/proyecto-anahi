@@ -6,14 +6,17 @@ CONF = os.path.join(os.path.dirname(__file__), 'settings')
 __data = {}
 
 def load():
+    global __data
     fh = open(CONF, 'rw')
+
     try:
         __data = json.loads(fh.read())
     except ValueError:
-        __data = {}
+        pass
     fh.close()
 
 def get(modname):
+    global __data
     if modname not in __data:
         __data[modname] = {}
 
