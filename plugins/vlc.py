@@ -6,7 +6,8 @@ class VLC(object):
 
     def _do(self, cmd):
         self.tn.write(cmd+'\n')
-        print self.tn.read_very_eager()
+        self.tn.read_very_eager()
+        #print self.tn.read_very_eager()
 
     def addfile(self, filename):
         self._do('add ' + filename)

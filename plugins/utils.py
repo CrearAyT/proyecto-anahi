@@ -49,6 +49,7 @@ class adsr(object):
             self.triggered = True
             self.samplec = self.attackl
             self.state = 'attack'
+            self.on_trigger_cb(x)
             return self._attack(x)
         return 0
 
