@@ -11,6 +11,7 @@ from eblib.utils import get_all_from_queue, get_item_from_queue
 from livedatafeed import LiveDataFeed
 
 import plugins
+import config
 
 DEFAULT_PORT = '/dev/ttyACM0'
 
@@ -133,7 +134,11 @@ class DataMonitor(QMainWindow):
         event.accept()
 
 if __name__ == '__main__':
+    config.load()
+
     app = QApplication(sys.argv)
     form = DataMonitor()
     form.show()
     app.exec_()
+
+    config.save()
