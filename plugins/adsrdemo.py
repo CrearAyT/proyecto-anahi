@@ -8,8 +8,10 @@ from utils import lpfilt, diff, adsr
 
 import config
 
+from vlc import VLC
+
 class ADSRDemo(QMainWindow):
-    name = 'Prueba ADSR'
+    name = 'Prueba ADSR + conexion VLC'
 
     def __init__(self, parent=None):
         super(ADSRDemo, self).__init__(parent)
@@ -55,6 +57,10 @@ class ADSRDemo(QMainWindow):
         b = QPushButton('Cargar')
         b.clicked.connect(self.cargar)
         hb.addWidget(b)
+
+        b = QPushButton('Conectar con vlc')
+        b.clicked.connect(self.vlc_connect)
+        vbox.addWidget(b)
 
         self.sliders = []
         for attr,params  in self.params.iteritems():
@@ -115,3 +121,45 @@ class ADSRDemo(QMainWindow):
     def destroy(self):
         self.close()
 
+    def vlc_connect(self):
+        self.vlc = None
+        try:
+            self.vlc = VLC()
+            self.adsr.on_trigger_cb = self.vlc_play
+            self.adsr.while_triggered_cb = self.vlc_vol
+            self.adsr.on_release_cb = self.vlc_stop
+
+        except:
+            def dummy():
+                pass
+
+            self.adsr.on_trigger_cb = dummy
+            self.adsr.while_triggered_cb = dummy
+            self.adsr.on_release_cb = dummy
+
+            self.vlc = None
+
+    def vlc_play(self, x):
+        if self.vlc is None:
+            return
+        try:
+            self.vlc.play()
+            self.vlc.volume(x/4)
+        except:
+            self.vlc = None
+
+    def vlc_vol(self,x):
+        if self.vlc is None:
+            return
+        try:
+            self.vlc.volume(x/4)
+        except:
+            self.vlc = None
+
+    def vlc_stop(self):
+        if self.vlc is None:
+            return
+        try:
+            self.vlc.stop()
+        except:
+            self.vlc = None
