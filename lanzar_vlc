@@ -1,0 +1,1 @@
+vlc --extraintf rc --rc-host localhost:4212
