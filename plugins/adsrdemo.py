@@ -6,11 +6,15 @@ import PyQt4.Qwt5 as Qwt
 from plotwindow import PlotWindow
 from utils import lpfilt, diff, adsr
 
+import config
+
 class ADSRDemo(QMainWindow):
     name = 'Prueba ADSR'
 
     def __init__(self, parent=None):
         super(ADSRDemo, self).__init__(parent)
+
+        self.conf = config.get('adsrdemo.py')
 
         self.plotw = PlotWindow(self)
         self.plotw.add_curve('Chan 1')
@@ -43,6 +47,16 @@ class ADSRDemo(QMainWindow):
         self.main_frame.setLayout(lay)
         self.setCentralWidget(self.main_frame)
 
+        hb = QHBoxLayout()
+        vbox.addLayout(hb)
+        b = QPushButton('Guardar')
+        b.clicked.connect(self.guardar)
+        hb.addWidget(b)
+        b = QPushButton('Cargar')
+        b.clicked.connect(self.cargar)
+        hb.addWidget(b)
+
+        self.sliders = []
         for attr,params  in self.params.iteritems():
             (nom, xmin, xmax, k, kdisp, default) = params
             lbl = QLabel(nom)
@@ -53,11 +67,23 @@ class ADSRDemo(QMainWindow):
             sld.setValue(default) 
             vbox.addWidget(lbl)
             vbox.addWidget(sld)
+            self.sliders.append(sld)
 
         vbox.addStretch(1)
 
         self.setWindowTitle('Prueba ADSR')
 
+
+    def guardar(self):
+        for sld in self.sliders:
+            (nom, lbl, attr, k, kdisp) = sld.params
+            self.conf[attr] = sld.value()
+
+    def cargar(self):
+        for sld in self.sliders:
+            (nom, lbl, attr, k, kdisp) = sld.params
+            if attr in self.conf:
+                sld.setValue(self.conf[attr])
 
     def set_param(self, value):
         (nom, lbl, attr, k, kdisp) = self.sender().params
