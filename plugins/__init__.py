@@ -1,6 +1,7 @@
 from deriv import Deriv
 from derivfilt import DerivFilt
 from adsrdemo import ADSRDemo
+from demo4can import ADSRDemo4C
 
 class SinkTest(object):
     name = 'Volcar datos a stdout'
@@ -45,4 +46,4 @@ class PlotTest(object):
     def destroy(self):
         self.plotw.close()
 
-all = [SinkTest, PlotTest, Deriv, DerivFilt, ADSRDemo]
+all = [SinkTest, PlotTest, Deriv, DerivFilt, ADSRDemo, ADSRDemo4C]
