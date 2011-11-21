@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import atexit
 import time
 
 import telnetlib
@@ -49,3 +50,5 @@ class VLCProcess(VLC):
         self.child = subprocess.Popen(args, bufsize=0, universal_newlines=True)
         time.sleep(2)
         VLC.__init__(self, port=port)
+
+        atexit.register(self.child.kill)
