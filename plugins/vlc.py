@@ -1,3 +1,7 @@
+import sys
+import subprocess
+import time
+
 import telnetlib
 
 class VLC(object):
@@ -28,3 +32,20 @@ class VLC(object):
 
     def quit(self):
         self._do('quit')
+
+class VLCProcess(VLC):
+    __port = 4212
+    def __init__(self, port=None, gui=False):
+
+        if port is None:
+            port = VLCProcess.__port
+            VLCProcess.__port = VLCProcess.__port + 1
+
+        args = ['/usr/bin/vlc', '-I', 'rc', '--rc-host', 'localhost:'+str(port)]
+        if gui:
+            args.append('--extraintf')
+            args.append('qt')
+
+        self.child = subprocess.Popen(args, bufsize=0, universal_newlines=True)
+        time.sleep(2)
+        VLC.__init__(self, port=port)
