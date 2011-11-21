@@ -34,6 +34,20 @@ class VLC(object):
     def quit(self):
         self._do('quit')
 
+    def repeat(self, what):
+        """Si True, reproducir indefinidamente el archivo actual """
+        if what:
+            self._do('repeat 1')
+        else:
+            self._do('repeat 0')
+
+    def loop(self, what):
+        """Si True, reproducir indefinidamente la lista de archivos """
+        if what:
+            self._do('loop 1')
+        else:
+            self._do('loop 0')
+
 class VLCProcess(VLC):
     __port = 4212
     def __init__(self, port=None, gui=False):
