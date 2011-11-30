@@ -25,12 +25,15 @@ class adsr(object):
         self.on_trigger = Signal()
         self.while_triggered = Signal()
 
+        self.internal_state_changed = Signal()
+
     def reset(self):
         self.samplec = 0
         self.lp1.y = 0
         self.state = 'quiet'
         self.triggered = False
         self.on_release()
+        self.internal_state_changed(0, self.triggered, self.dx.x, self.lp1.y)
 
     def _quiet(self, x):
         d = self.dx(x)
@@ -41,6 +44,7 @@ class adsr(object):
             self.state = 'attack'
             self.on_trigger(x)
             return self._attack(x)
+        self.internal_state_changed(0, self.triggered, self.dx.x, self.lp1.y)
         return 0
 
     def _attack(self, x):
@@ -50,6 +54,7 @@ class adsr(object):
             self.samplec = self.samplec - 1
             val = self.lp1(x)
             self.while_triggered(val)
+            self.internal_state_changed(val, self.triggered, self.dx.x, self.lp1.y)
             return val
         else:
             self.state = 'sustain'
@@ -63,6 +68,7 @@ class adsr(object):
             self.samplec = self.samplec - 1
             val = self.lp1(x)
             self.while_triggered(val)
+            self.internal_state_changed(val, self.triggered, self.dx.x, self.lp1.y)
             return val
         else:
             self.state = 'release'
@@ -76,12 +82,14 @@ class adsr(object):
             self.samplec = self.samplec - 1
             val = self.lp1(x*(1.*self.samplec/self.rell))
             self.while_triggered(val)
+            self.internal_state_changed(val, self.triggered, self.dx.x, self.lp1.y)
             return val
         else:
             self.state = 'quiet'
             self.triggered = False
             self.lp1.y = 0
             self.on_release()
+            self.internal_state_changed(0, self.triggered, self.dx.x, self.lp1.y)
             return 0
 
     def __call__(self, x):
