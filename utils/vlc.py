@@ -3,6 +3,7 @@ import subprocess
 import atexit
 import time
 
+import socket
 import telnetlib
 
 class VLC(object):
@@ -25,8 +26,7 @@ class VLC(object):
     def play(self, idx=0):
         if idx:
             self._do('goto ' + str(idx))
-        else:
-            self._do('play')
+        self._do('play')
 
     def stop(self):
         self._do('stop')
@@ -62,7 +62,12 @@ class VLCProcess(VLC):
             args.append('qt')
 
         self.child = subprocess.Popen(args, bufsize=0, universal_newlines=True)
-        time.sleep(2)
-        VLC.__init__(self, port=port)
+        for x in range(10):
+            time.sleep(.5)
+            try:
+                self.tn = telnetlib.Telnet('localhost', port)
+                break
+            except socket.error:
+                continue
 
         atexit.register(self.child.kill)
