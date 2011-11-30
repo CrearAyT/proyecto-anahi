@@ -1,19 +1,4 @@
-class diff(object):
-    def __init__(self, x0=0):
-        self.x = x0
-    def __call__(self, x):
-        ret = x - self.x
-        self.x = x
-        return ret
-        
-class lpfilt(object):
-    def __init__(self, alfa=0.5, x0=0, y0=0):
-        self.alfa = alfa
-        self.y=y0
-    def __call__(self, x):
-        y = self.alfa * self.y + (1-self.alfa)*x
-        self.y = y
-        return y
+from dsp import diff, lpfilt
 
 class adsr(object):
     def __init__(self):
@@ -105,37 +90,4 @@ class adsr(object):
 
     def __call__(self, x):
         return self._states[self.state](x)
-
-
-"""
-File:    signal.py
-Author:  Thiago Marcos P. Santos
-Created: August 28, 2008
-
-Purpose: A signal/slot implementation
-"""
-
-from weakref import WeakValueDictionary
-
-
-class Signal(object):
-    def __init__(self):
-        self.__slots = WeakValueDictionary()
-
-    def __call__(self, *args, **kargs):
-        for key in self.__slots:
-            func, _ = key
-            func(self.__slots[key], *args, **kargs)
-
-    def connect(self, slot):
-        key = (slot.im_func, id(slot.im_self))
-        self.__slots[key] = slot.im_self
-
-    def disconnect(self, slot):
-        key = (slot.im_func, id(slot.im_self))
-        if key in self.__slots:
-            self.__slots.pop(key)
-
-    def clear(self):
-        self.__slots.clear()
 
