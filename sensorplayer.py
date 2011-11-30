@@ -91,3 +91,16 @@ class SensorPlayer(object):
         if self._vlc:
             self._vlc.loop(what)
 
+
+if __name__ == '__main__':
+    from time import sleep
+
+    p = SensorPlayer()
+    p.start()
+    p._playlist.append('/home/pardo/musica/Eric_Clapton-Bad_Love.mp3')
+    p._playlist.append('/home/pardo/musica/Manu Chao Amadou Et Mariam - Senegal Fast Food.ogg')
+
+    p.start()
+
+    while True:
+        sleep(1)
