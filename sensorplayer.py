@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from utils.adsr import adsr
 from utils.signal import Signal
 from utils.vlc import VLCProcess
@@ -16,8 +18,9 @@ class Playlist(list):
                 orig = getattr(list, nom)
                 def inner(*args):
                     s = self
+                    ret = orig(s, *args)
                     s.changed()
-                    return orig(s, *args)
+                    return ret
                 return inner
             setattr(self, n, wrapper(n))
 
