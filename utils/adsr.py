@@ -1,4 +1,5 @@
 from dsp import diff, lpfilt
+from signal import Signal
 
 class adsr(object):
     def __init__(self):
@@ -20,12 +21,16 @@ class adsr(object):
         self.state = 'quiet' # quiet attack sustain release
         self._states = {'quiet':self._quiet, 'attack':self._attack, 'sustain':self._sustain, 'release':self._release}
 
+        self.on_release = Signal()
+        self.on_trigger = Signal()
+        self.while_triggered = Signal()
+
     def reset(self):
         self.samplec = 0
         self.lp1.y = 0
         self.state = 'quiet'
         self.triggered = False
-        self.on_release_cb()
+        self.on_release()
 
     def _quiet(self, x):
         d = self.dx(x)
@@ -34,7 +39,7 @@ class adsr(object):
             self.triggered = True
             self.samplec = self.attackl
             self.state = 'attack'
-            self.on_trigger_cb(x)
+            self.on_trigger(x)
             return self._attack(x)
         return 0
 
@@ -44,7 +49,7 @@ class adsr(object):
             self.dx(x)
             self.samplec = self.samplec - 1
             val = self.lp1(x)
-            self.while_triggered_cb(val)
+            self.while_triggered(val)
             return val
         else:
             self.state = 'sustain'
@@ -57,7 +62,7 @@ class adsr(object):
             self.dx(x)
             self.samplec = self.samplec - 1
             val = self.lp1(x)
-            self.while_triggered_cb(val)
+            self.while_triggered(val)
             return val
         else:
             self.state = 'release'
@@ -70,23 +75,14 @@ class adsr(object):
             self.dx(x)
             self.samplec = self.samplec - 1
             val = self.lp1(x*(1.*self.samplec/self.rell))
-            self.while_triggered_cb(val)
+            self.while_triggered(val)
             return val
         else:
             self.state = 'quiet'
             self.triggered = False
             self.lp1.y = 0
-            self.on_release_cb()
+            self.on_release()
             return 0
-
-    def on_release_cb(self):
-        pass
-
-    def on_trigger_cb(self,x):
-        pass
-
-    def while_triggered_cb(self, x):
-        pass
 
     def __call__(self, x):
         return self._states[self.state](x)
