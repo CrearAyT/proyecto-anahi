@@ -7,7 +7,11 @@ __data = {}
 
 def load():
     global __data
-    fh = open(CONF, 'rw')
+
+    try:
+        fh = open(CONF, 'r')
+    except IOError:
+        return
 
     try:
         __data = json.loads(fh.read())
