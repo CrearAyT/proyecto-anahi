@@ -65,12 +65,16 @@ class VLCProcess(VLC):
             args.append('qt')
 
         self.child = subprocess.Popen(args, bufsize=0, universal_newlines=True)
+        time.sleep(2)
         for x in range(10):
             time.sleep(.5)
             try:
                 self.tn = telnetlib.Telnet('localhost', port)
                 break
             except socket.error:
+                self.tn = None
                 continue
+        if self.tn is None:
+            raise OSError('No se puede conectar a VLC')
 
         atexit.register(self.child.kill)
