@@ -68,3 +68,22 @@ class adsrWidget(QMainWindow):
             except AttributeError:
                 continue
 
+def main():
+    from adsr import adsr
+    app = QApplication(sys.argv)
+
+    wid = adsrWidget()
+    wid.show()
+
+    a = adsr()
+    for attr,params  in wid.params.iteritems():
+        (nom, xmin, xmax, k, kdisp, default) = params
+        v = k*xmax
+        setattr(a, attr,v)
+
+    wid.adsr = a
+
+    app.exec_()
+
+if __name__ == "__main__":
+    main()
