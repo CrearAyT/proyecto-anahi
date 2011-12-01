@@ -40,6 +40,9 @@ class SensorPlayer(object):
         self._trigger_light = True
         self._invert_control = False
 
+        # Volumen predeterminado, 0-256 (256-512 -> 100%-200%)
+        self.default_volume = 100
+        self.adsr.while_triggered.connect(self.control_cb)
 
     @property
     def playlist(self):
@@ -64,6 +67,16 @@ class SensorPlayer(object):
     def stop(self):
         if self._vlc is not None:
             self._vlc.stop()
+
+    def control_cb(self, x):
+        if self._vlc is None:
+            return
+        self._vlc.volume(x/4)
+
+    def release_cb(self):
+        if self._vlc is None:
+            return
+        self._vlc.volume(self.default_volume)
 
     @property
     def repeat(self):
