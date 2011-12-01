@@ -37,6 +37,8 @@ class SensorPlayer(object):
 
         self.adsr = adsr()
 
+        self._trigger_light = True
+        self._invert_control = False
 
 
     @property
@@ -92,6 +94,33 @@ class SensorPlayer(object):
 
         if self._vlc:
             self._vlc.loop(what)
+
+    @property
+    def trigger_on_light(self):
+        """Si True, dispararse al iluminar el sensor. Si False al oscurecerlo"""
+        return self._triggerlight
+
+    @trigger_on_light.setter
+    def trigger_on_light(self, what):
+        if what:
+            self._trigger_light = True
+            self.adsr.slope_sign = 1
+        else:
+            self._trigger_light = False
+            self.adsr.slope_sign = -1
+
+    @property
+    def invert_control(self):
+        """Si True, mas luz menos volumen. Si False mas luz mas volumen"""
+        return self._invert_control
+
+    @invert_control.setter
+    def invert_control(self, what):
+        # FIXME: codigo en el callback del adsr para hacer esto.
+        if what:
+            self._invert_control = True
+        else:
+            self._invert_control = False
 
 
 if __name__ == '__main__':
