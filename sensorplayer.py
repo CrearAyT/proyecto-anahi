@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from utils.adsr import adsr
-from utils.signal import Signal
+from utils.misc import Signal
 from utils.vlc import VLCProcess
 
 class Playlist(list):

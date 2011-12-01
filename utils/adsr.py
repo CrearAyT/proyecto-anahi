@@ -1,5 +1,5 @@
 from dsp import diff, lpfilt
-from signal import Signal
+from misc import Signal
 
 class adsr(object):
     def __init__(self):
