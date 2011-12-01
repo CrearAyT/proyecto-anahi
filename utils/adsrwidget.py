@@ -69,6 +69,7 @@ class adsrWidget(QMainWindow):
                 continue
 
 def main():
+    import sys
     from adsr import adsr
     app = QApplication(sys.argv)
 
@@ -82,6 +83,10 @@ def main():
         setattr(a, attr,v)
 
     wid.adsr = a
+
+    wid2 = adsrWidget()
+    wid2.show()
+    wid2.adsr = None
 
     app.exec_()
 
