@@ -55,11 +55,11 @@ class adsrWidget(QMainWindow):
 
     @adsr.setter
     def adsr(self, adsr):
+        self._adsr = adsr
         if adsr is None:
-            # FIXME: deshabilitar widget
+            self.setEnabled(False)
             return
 
-        self._adsr = adsr
         for sld in self.sliders:
             (nom, lbl, attr, k, kdisp) = sld.params
             try:
