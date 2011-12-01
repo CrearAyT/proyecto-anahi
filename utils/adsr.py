@@ -3,8 +3,8 @@ from misc import Signal
 
 class adsr(object):
     def __init__(self):
-        umbral = 100
-        self.umbral = umbral
+        self.umbral = 100
+        self.slope_sign = 1
 
         self.dx = diff()
         self.lp1 = lpfilt(alfa=0.8)
@@ -38,7 +38,7 @@ class adsr(object):
     def _quiet(self, x):
         d = self.dx(x)
         ok = 150*(abs(d)>=self.umbral)
-        if (ok and d<0):
+        if (ok and (d*self.slope_sign)>0):
             self.triggered = True
             self.samplec = self.attackl
             self.state = 'attack'
