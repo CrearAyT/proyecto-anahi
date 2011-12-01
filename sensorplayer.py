@@ -26,11 +26,12 @@ class Playlist(list):
 
 
 class SensorPlayer(object):
-    def __init__(self):
+    def __init__(self, gui=True):
 
         self._playlist = Playlist()
         self._playlist.changed.connect(self.__update_playlist)
 
+        self._use_gui = gui
         self._vlc = None
         self._repeat = False
         self._loop = False
@@ -58,7 +59,7 @@ class SensorPlayer(object):
 
     def start(self):
         if self._vlc is None:
-            self._vlc = VLCProcess(gui=True)
+            self._vlc = VLCProcess(gui=self._use_gui)
             self.__update_playlist()
             self._vlc.repeat(self._repeat)
             self._vlc.loop(self._loop)
