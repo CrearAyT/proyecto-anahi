@@ -31,6 +31,9 @@ class VLC(object):
     def stop(self):
         self._do('stop')
 
+    def clear(self):
+        self._do('clear')
+
     def quit(self):
         self._do('quit')
 

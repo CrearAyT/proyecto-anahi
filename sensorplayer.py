@@ -47,7 +47,7 @@ class SensorPlayer(object):
         if self._vlc is None:
             return
 
-        #FIXME: borrar lista del _vlc y reemplazar por la nueva
+        self._vlc.clear()
         for f in self._playlist:
             self._vlc.addfile(f)
 
