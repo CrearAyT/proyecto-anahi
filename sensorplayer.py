@@ -55,6 +55,8 @@ class SensorPlayer(object):
         if self._vlc is None:
             self._vlc = VLCProcess(gui=True)
             self.__update_playlist()
+            sefl._vlc.repeat(self._repeat)
+            sefl._vlc.loop(self._loop)
         self._vlc.play()
 
     def stop(self):
