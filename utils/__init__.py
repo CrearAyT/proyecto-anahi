@@ -1,1 +1,1 @@
-__all__ = ["adsr", "dsp", "plotwindow", "signal", "vlc"]
+__all__ = ["adsr", "dsp", "plotwindow", "misc", "vlc"]
