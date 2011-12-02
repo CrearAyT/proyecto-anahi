@@ -3,22 +3,24 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import PyQt4.Qwt5 as Qwt
 
+#           atributo adsr : [ nombre ,              min, max,  k,       kdisp,   default]
+adsr_params = {  'attackl':['Duracion Ataque',      0,   200,  1./10,   1./100,  150 ],
+                 'sustl':['Duracion Sustain',       0,   900,  1,       1./10,   100 ],
+                 'rell':['Duracion Release',        0,   300,  1,       1./10,   15  ],
+                 'alfa_att':['alfa Ataque',         0,   1000, 1./1000, 1./1000, 300 ],
+                 'alfa_sus':['alfa Sustain',        0,   1000, 1./1000, 1./1000, 850 ],
+                 'alfa_rel':['alfa Release',        0,   1000, 1./1000, 1./1000, 850 ],
+                 'umbral':['umbral deteccion',      0,   400,  1,       1,       100 ],
+                 'slope_sign':['pendiente umbral', -1,   1,    1,       1,       1   ]
+             }
 
 class adsrWidget(QMainWindow):
     def __init__(self, parent=None):
         super(adsrWidget, self).__init__(parent)
-        
+
         self._adsr = None
 
-        # atributo adsr : [nombre ,                    min, max,  k,       kdisp,   default]
-        self.params = {  'attackl':['Duracion Ataque', 0,   200,  1./10,   1./100,  150 ],
-                         'sustl':['Duracion Sustain',  0,   900,  1,       1./10,   100 ],
-                         'rell':['Duracion Release',   0,   300,  1,       1./10,   15  ],
-                         'alfa_att':['alfa Ataque',    0,   1000, 1./1000, 1./1000, 300 ],
-                         'alfa_sus':['alfa Sustain',   0,   1000, 1./1000, 1./1000, 850 ],
-                         'alfa_rel':['alfa Release',   0,   1000, 1./1000, 1./1000, 850 ],
-                         'umbral':['umbral deteccion', 0,   400,  1,       1,       100 ]
-                       }
+        self.params = adsr_params
 
         self.main_frame = QWidget()
         vbox = QVBoxLayout()
