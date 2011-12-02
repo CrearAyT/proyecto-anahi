@@ -29,6 +29,9 @@ class adsrWidget(QMainWindow):
 
         self.sliders = []
         for attr,params  in self.params.iteritems():
+            if attr == 'slope_sign':
+                continue            #creo que solo va a confundir.
+
             (nom, xmin, xmax, k, kdisp, default) = params
             lbl = QLabel(nom)
             sld = QSlider(Qt.Horizontal)
