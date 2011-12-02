@@ -72,6 +72,10 @@ class SensorPlayer(object):
     def control_cb(self, x):
         if self._vlc is None:
             return
+
+        if self._invert_control:
+            x = 1024 - x
+
         self._vlc.volume(x/4)
 
     def release_cb(self):
@@ -130,7 +134,6 @@ class SensorPlayer(object):
 
     @invert_control.setter
     def invert_control(self, what):
-        # FIXME: codigo en el callback del adsr para hacer esto.
         if what:
             self._invert_control = True
         else:
