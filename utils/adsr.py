@@ -4,7 +4,7 @@ from misc import Signal
 class adsr(object):
     def __init__(self):
         self.umbral = 100
-        self.slope_sign = 1
+        self._slope_sign = 1
 
         self.dx = diff()
         self.lp1 = lpfilt(alfa=0.8)
@@ -27,6 +27,17 @@ class adsr(object):
 
         self.internal_state_changed = Signal()
 
+    @property
+    def slope_sign(self):
+        return self._slope_sign
+
+    @slope_sign.setter
+    def slope_sign(self, x):
+        if x >= 0:
+            self._slope_sign = 1
+        else:
+            self._slope_sign = -1
+
     def reset(self):
         self.samplec = 0
         self.lp1.y = 0
@@ -38,7 +49,7 @@ class adsr(object):
     def _quiet(self, x):
         d = self.dx(x)
         ok = 150*(abs(d)>=self.umbral)
-        if (ok and (d*self.slope_sign)>0):
+        if (ok and (d*self._slope_sign)>0):
             self.triggered = True
             self.samplec = self.attackl
             self.state = 'attack'
