@@ -1,6 +1,19 @@
 from dsp import diff, lpfilt
 from misc import Signal
 
+
+#           atributo adsr : [ nombre ,              min, max,  k,       kdisp,   default]
+adsr_params = {  'attackl':['Duracion Ataque',      0,   200,  1./10,   1./100,  150 ],
+                 'sustl':['Duracion Sustain',       0,   900,  1,       1./10,   100 ],
+                 'rell':['Duracion Release',        0,   300,  1,       1./10,   15  ],
+                 'alfa_att':['alfa Ataque',         0,   1000, 1./1000, 1./1000, 300 ],
+                 'alfa_sus':['alfa Sustain',        0,   1000, 1./1000, 1./1000, 850 ],
+                 'alfa_rel':['alfa Release',        0,   1000, 1./1000, 1./1000, 850 ],
+                 'umbral':['umbral deteccion',      0,   400,  1,       1,       100 ],
+                 'slope_sign':['pendiente umbral', -1,   1,    1,       1,       1   ]
+             }
+
+
 class adsr(object):
     def __init__(self):
         self.umbral = 100
@@ -105,4 +118,38 @@ class adsr(object):
 
     def __call__(self, x):
         return self._states[self.state](x)
+
+class adsrList(list):
+    def __init__(self, iterable=None):
+        if iterable is not None:
+            super(adsrList, self).__init__(iterable)
+        else:
+            super(adsrList, self).__init__()
+
+        for attr,v in adsr_params.iteritems():
+            nombre, vmin, vmax, k, kdisp, default = v
+            self.__dict__[attr] =  k*default
+
+    def __setattr__(self, name, value):
+        self.__dict__[name] = value
+        if name in adsr_params:
+            for adsr in self:
+                setattr(adsr, name, value)
+
+    def _update_child(self,child):
+        for name in adsr_params:
+            setattr(child, name, self.__dict__[name])
+
+    def insert(self, index, item):
+        list.insert(self, index, item)
+        self._update_child(item)
+
+    def append(self, item):
+        list.append(self,item)
+        self._update_child(item)
+
+    def extend(self, iterable):
+        list.extend(self, iterable)
+        for child in iterable:
+            self._update_child(child)
 
