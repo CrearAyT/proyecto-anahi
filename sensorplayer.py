@@ -42,7 +42,7 @@ class SensorPlayer(object):
         self._invert_control = False
 
         # Volumen predeterminado, 0-256 (256-512 -> 100%-200%)
-        self.default_volume = 100
+        self._default_volume = 100
         self.adsr.while_triggered.connect(self.control_cb)
 
     @property
@@ -81,7 +81,7 @@ class SensorPlayer(object):
     def release_cb(self):
         if self._vlc is None:
             return
-        self._vlc.volume(self.default_volume)
+        self._vlc.volume(self._default_volume)
 
     @property
     def repeat(self):
@@ -139,6 +139,16 @@ class SensorPlayer(object):
         else:
             self._invert_control = False
 
+    @property
+    def default_volume(self):
+        return self._default_volume
+
+    @default_volume.setter
+    def default_volume(self, volume):
+        self._default_volume = volume
+        if self._vlc is None:
+            return
+        self._vlc.volume(volume)
 
 if __name__ == '__main__':
     from time import sleep
