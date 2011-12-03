@@ -20,11 +20,18 @@ class mainWindow(QtGui.QMainWindow):
         self.adsrw.adsr = self.adsrList
         self.adsrWidgetContainer.addWidget(self.adsrw)
 
+        self.current_adsr = None
+        self.monitor_adsr = True
+
         self.players = []
         self.sounds = []
 
         self.plotw = PlotWindow()
         self.plotWindowContainer.addWidget(self.plotw)
+
+        for curve in 'Entrada d/dT Umbral Salida'.split():
+            self.plotw.add_curve(curve)
+
         self.plotw.show()
 
     @QtCore.pyqtSlot()
@@ -51,7 +58,12 @@ class mainWindow(QtGui.QMainWindow):
     @QtCore.pyqtSlot(bool)
     def on_plotWindowGroup_clicked(self, checked):
         #FIXME: desconectar el grafico  y borrar datos
-        pass
+        if checked:
+            self.monitor_adsr = True
+        else:
+            self.monitor_adsr = False
+
+        self.connect_adsr()
 
     @QtCore.pyqtSlot(int)
     def on_sldVolumen_valueChanged(self, value):
@@ -88,6 +100,30 @@ class mainWindow(QtGui.QMainWindow):
             for player in self.players:
                 player.stop()
 
+    @QtCore.pyqtSlot(int)
+    def on_sensorList_currentRowChanged(self, row):
+        self.connect_adsr(self.adsrList[row])
+
+    def clear_plot(self):
+        data = [ [0] ] * 5
+        self.plotw.samples = data
+        self.plotw.replot()
+
+    def connect_adsr(self, adsr=None):
+        if self.monitor_adsr:
+            if adsr is not None and adsr is not self.current_adsr:
+                if self.current_adsr:
+                    self.current_adsr.internal_state_changed.disconnect(self.adsr_internal_cb)
+                self.current_adsr = adsr
+                self.clear_plot()
+                self.current_adsr.internal_state_changed.connect(self.adsr_internal_cb)
+        else:
+            if self.current_adsr:
+                self.current_adsr.internal_state_changed.disconnect(self.adsr_internal_cb)
+
+    def adsr_internal_cb(self, *args, **kwargs):
+        #FIXME: actualizar grafico
+        pass
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
