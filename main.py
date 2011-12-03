@@ -121,13 +121,16 @@ class mainWindow(QtGui.QMainWindow):
 
     def connect_adsr(self, adsr=None):
         if self.monitor_adsr:
+            self.plotw.clear()
+            self._idx = 0
             if adsr is not None and adsr is not self.current_adsr:
                 if self.current_adsr:
                     self.current_adsr.internal_state_changed.disconnect(self.adsr_internal_cb)
                 self.current_adsr = adsr
-                self.plotw.clear()
-                self._idx = 0
                 self.current_adsr.internal_state_changed.connect(self.adsr_internal_cb)
+            else:
+                if self.current_adsr:
+                    self.current_adsr.internal_state_changed.connect(self.adsr_internal_cb)
         else:
             if self.current_adsr:
                 self.current_adsr.internal_state_changed.disconnect(self.adsr_internal_cb)
