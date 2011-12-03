@@ -6,10 +6,12 @@ from PyQt4 import QtCore, QtGui, uic
 import PyQt4.Qwt5 as Qwt
 import Queue
 
-from utils.adsr import adsrList
+from utils.adsr import adsrList, adsr_params
 from sensorplayer import SensorPlayer
 from utils.adsrwidget import adsrWidget
 from utils.plotwindow import PlotWindow
+
+from utils import config
 
 from com_monitor import ComMonitorThread
 from eblib.serialutils import full_port_name, enumerate_serial_ports
@@ -51,8 +53,57 @@ class mainWindow(QtGui.QMainWindow):
 
         self.open_port()
 
-    @QtCore.pyqtSlot()
-    def on_sensorAdd_clicked(self):
+        self.load_config()
+
+    def load_config(self):
+        config.load()
+
+        adsrconf = config.get('adsr')
+        if adsrconf:
+            for k,v in adsrconf.iteritems():
+                setattr(self.adsrList, k, v)
+            self.adsrw.adsr = self.adsrList
+
+        sounds = config.get('sounds')
+        if sounds:
+            for snd in sounds['files']:
+                self.add_sound(str(snd))
+
+        globs = config.get('globals')
+        if globs:
+            self.invert_control = globs['invert_control']
+            self.trigger_shadow = globs['trigger_shadow']
+            if self.invert_control:
+                self.invert.setCheckState(QtCore.Qt.Checked)
+            if self.trigger_shadow:
+                self.invert_slope.setCheckState(QtCore.Qt.Checked)
+
+            self.sldVolumen.setValue(globs['default_volume'])
+
+            for x in xrange(globs['sensor_count']):
+                self.add_sensor()
+
+    def closeEvent(self, event):
+        self.save_config()
+        event.accept()
+
+    def save_config(self):
+        adsrconf = config.get('adsr')
+        for param in adsr_params.keys():
+            adsrconf[param] = getattr(self.adsrList, param)
+
+        sounds = config.get('sounds')
+        sounds['files'] = self.sounds[:]
+
+        globs = config.get('globals')
+        globs['invert_control'] = self.invert_control
+        globs['trigger_shadow'] = self.trigger_shadow
+        globs['default_volume'] = self.sldVolumen.value()
+        globs['sensor_count'] = len(self.players)
+
+        config.save()
+
+    def add_sensor(self):
         play = SensorPlayer(gui=False)
         self.players.append(play)
         self.adsrList.append(play.adsr)
@@ -61,6 +112,10 @@ class mainWindow(QtGui.QMainWindow):
         play.trigger_on_light = not self.trigger_shadow
 
         self.sensorList.addItem('Sensor %i'%len(self.adsrList))
+
+    @QtCore.pyqtSlot()
+    def on_sensorAdd_clicked(self):
+        self.add_sensor()
 
     @QtCore.pyqtSlot()
     def on_sensorDelete_clicked(self):
@@ -110,13 +165,16 @@ class mainWindow(QtGui.QMainWindow):
         for player in self.players:
             player.default_volume = value
 
+    def add_sound(self, filename):
+            self.sounds.append(filename)
+            self.soundList.addItem(filename)
+
     @QtCore.pyqtSlot()
     def on_soundAdd_clicked(self):
         fn = QtGui.QFileDialog.getOpenFileName()
         if fn:
             fn = str(fn)
-            self.sounds.append(fn)
-            self.soundList.addItem(fn)
+            self.add_sound(fn)
 
     @QtCore.pyqtSlot()
     def on_soundDelete_clicked(self):
