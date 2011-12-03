@@ -8,7 +8,8 @@ class PlotWindow(QMainWindow):
     def __init__(self, parent=None):
         super(PlotWindow, self).__init__(parent)
         
-        self.samples = [[]]
+        self.samples = []
+        self.xdata = []
         self.max_samples = 200
         self._axis = ()
         self._curves = []
@@ -41,7 +42,6 @@ class PlotWindow(QMainWindow):
         legend = Qwt.QwtLegend()
         legend.setItemMode(Qwt.QwtLegend.ClickableItem)
         plot.insertLegend(legend, Qwt.QwtPlot.LeftLegend)
-
 
         def toggleVisibility(plotItem):
             """Toggle the visibility of a plot item
@@ -79,31 +79,33 @@ class PlotWindow(QMainWindow):
 
     
     def add_datapoint(self, x, *ydata):
-        self.samples[0].append(x)
-        for idx in range(min(len(ydata), len(self.samples)-1)):
-            self.samples[idx+1].append(ydata[idx])
+
+        self.xdata.append(x)
+        for idx in range(min(len(ydata), len(self._curves))):
+            self.samples[idx].append(ydata[idx])
 
         if len(self.samples[0]) > self.max_samples:
+            self.xdata.pop(0)
             for col in self.samples:
             # puede pasar si agregamos menos datos que la cantidad de curvas
                 if col:
                     col.pop(0)
-        
-        self.plot.setAxisScale(Qwt.QwtPlot.xBottom, self.samples[0][0], max(self._axis[1], self.samples[0][-1]))
+
+        self.plot.setAxisScale(Qwt.QwtPlot.xBottom, self.xdata[0], max(self._axis[1], x))
         for idx,curve in enumerate(self._curves):
-            curve.setData(self.samples[0], self.samples[idx+1])
+            curve.setData(self.xdata, self.samples[idx])
                
         self.plot.replot()
-        self.replot()
-
 
     def replot(self):
         for idx,curve in enumerate(self._curves):
-            curve.setData(self.samples[0], self.samples[idx+1])
+            curve.setData(self.xdata, self.samples[idx])
                
         self.plot.replot()
             
-
+    def clear(self):
+        self.xdata = []
+        self.samples = [ [] for x in self._curves ]
 
 def main():
     import sys, math
