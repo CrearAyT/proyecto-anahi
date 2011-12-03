@@ -31,6 +31,8 @@ class mainWindow(QtGui.QMainWindow):
         self.monitor_adsr = True
 
         self.players = []
+        self.invert_control = False
+        self.trigger_shadow = False
         self.sounds = []
 
         self.plotw = PlotWindow()
@@ -54,6 +56,9 @@ class mainWindow(QtGui.QMainWindow):
         play = SensorPlayer(gui=False)
         self.players.append(play)
         self.adsrList.append(play.adsr)
+
+        play.invert_control = self.invert_control
+        play.trigger_on_light = not self.trigger_shadow
 
         self.sensorList.addItem('Sensor %i'%len(self.adsrList))
 
@@ -79,6 +84,26 @@ class mainWindow(QtGui.QMainWindow):
             self.monitor_adsr = False
 
         self.connect_adsr()
+
+    @QtCore.pyqtSlot(int)
+    def on_invert_stateChanged(self, state):
+        if state:
+            self.invert_control = True
+        else:
+            self.invert_control = False
+
+        for player in self.players:
+            player.invert_control = self.invert_control
+
+    @QtCore.pyqtSlot(int)
+    def on_invert_slope_stateChanged(self, state):
+        if state:
+            self.trigger_shadow = True
+        else:
+            self.trigger_shadow = False
+
+        for player in self.players:
+            player.trigger_on_light = not self.trigger_shadow
 
     @QtCore.pyqtSlot(int)
     def on_sldVolumen_valueChanged(self, value):
