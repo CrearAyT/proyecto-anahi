@@ -23,14 +23,15 @@ class PlotWindow(QMainWindow):
 
 
     def axis(self, xmin=0, xmax=20, xlabel='T', ymin=0, ymax=1024, ylabel='Valor'):
+        self._axis = (xmin, xmax, xlabel, ymin, ymax, ylabel)
+
         if self.plot is None:
-            self._axis = (xmin, xmax, xlabel, ymin, ymax, ylabel)
             return
         
         self.plot.setAxisTitle(Qwt.QwtPlot.xBottom, xlabel)
         self.plot.setAxisScale(Qwt.QwtPlot.xBottom, xmin, xmax, ((xmax-xmin)/20))
         self.plot.setAxisTitle(Qwt.QwtPlot.yLeft, ylabel)
-        self.plot.setAxisScale(Qwt.QwtPlot.yLeft, ymin, ymax, ((xmax-xmin)/10))
+        self.plot.setAxisScale(Qwt.QwtPlot.yLeft, ymin, ymax, ((ymax-ymin)/10))
 
         
     def create_plot(self):
