@@ -49,8 +49,6 @@ class mainWindow(QtGui.QMainWindow):
 
         self.open_port()
 
-        self.test_plot()
-
     @QtCore.pyqtSlot()
     def on_sensorAdd_clicked(self):
         play = SensorPlayer(gui=False)
