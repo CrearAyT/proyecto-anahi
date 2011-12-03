@@ -24,6 +24,10 @@ class Playlist(list):
                 return inner
             setattr(self, n, wrapper(n))
 
+    def clear(self):
+        while self:
+            list.pop(self)
+        self.changed()
 
 class SensorPlayer(object):
     def __init__(self, gui=True):
