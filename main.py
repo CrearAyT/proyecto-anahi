@@ -21,6 +21,7 @@ class mainWindow(QtGui.QMainWindow):
         self.adsrWidgetContainer.addWidget(self.adsrw)
 
         self.players = []
+        self.sounds = []
 
         self.plotw = PlotWindow()
         self.plotWindowContainer.addWidget(self.plotw)
@@ -57,7 +58,22 @@ class mainWindow(QtGui.QMainWindow):
         for player in self.players:
             player.default_volume = value
 
-    
+    @QtCore.pyqtSlot()
+    def on_soundAdd_clicked(self):
+        fn = QtGui.QFileDialog.getOpenFileName()
+        if fn:
+            self.sounds.append(fn)
+            self.soundList.addItem(fn)
+
+    @QtCore.pyqtSlot()
+    def on_soundDelete_clicked(self):
+        idx = self.soundList.currentRow()
+        if idx == -1:
+            return
+        item = self.soundList.takeItem(idx)
+        del item
+        del self.sounds[idx]
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     mainw = mainWindow()
