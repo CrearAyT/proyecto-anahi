@@ -62,6 +62,7 @@ class mainWindow(QtGui.QMainWindow):
     def on_soundAdd_clicked(self):
         fn = QtGui.QFileDialog.getOpenFileName()
         if fn:
+            fn = str(fn)
             self.sounds.append(fn)
             self.soundList.addItem(fn)
 
@@ -73,6 +74,20 @@ class mainWindow(QtGui.QMainWindow):
         item = self.soundList.takeItem(idx)
         del item
         del self.sounds[idx]
+
+    @QtCore.pyqtSlot(bool)
+    def on_Start_clicked(self, checked):
+        if checked:
+            for idx in xrange(min(len(self.players), len(self.sounds))):
+                player = self.players[idx]
+                player.playlist.clear()
+                player.default_volume = self.sldVolumen.value()
+                player.playlist.append(self.sounds[idx])
+                player.start()
+        else:
+            for player in self.players:
+                player.stop()
+
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
