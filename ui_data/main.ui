@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>580</width>
-    <height>555</height>
+    <width>655</width>
+    <height>556</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -171,6 +171,9 @@
          </item>
          <item>
           <widget class="QLabel" name="label">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
              <horstretch>1</horstretch>
@@ -211,6 +214,9 @@
            </property>
            <property name="text">
             <string>Iniciar / Detener</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -261,7 +267,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="adsrWidgetContainer" stretch="">
+        <layout class="QVBoxLayout" name="adsrWidgetContainer">
          <property name="sizeConstraint">
           <enum>QLayout::SetFixedSize</enum>
          </property>
