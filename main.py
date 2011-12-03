@@ -32,6 +32,8 @@ class mainWindow(QtGui.QMainWindow):
         for curve in 'Entrada d/dT Umbral Salida'.split():
             self.plotw.add_curve(curve)
 
+        self._idx = 0
+
         self.plotw.show()
 
     @QtCore.pyqtSlot()
@@ -116,13 +118,19 @@ class mainWindow(QtGui.QMainWindow):
                     self.current_adsr.internal_state_changed.disconnect(self.adsr_internal_cb)
                 self.current_adsr = adsr
                 self.clear_plot()
+                self._idx = 0
                 self.current_adsr.internal_state_changed.connect(self.adsr_internal_cb)
         else:
             if self.current_adsr:
                 self.current_adsr.internal_state_changed.disconnect(self.adsr_internal_cb)
 
     def adsr_internal_cb(self, *args, **kwargs):
-        #FIXME: actualizar grafico
+        salida, trig, entrada, dx = args
+        idx = self._idx + 1
+        self._idx = idx
+        self.plotw.add_datapoint(idx, entrada, dx, self.adsrList.umbral, salida)
+
+    def open_port(self):
         pass
 
 if __name__ == '__main__':
