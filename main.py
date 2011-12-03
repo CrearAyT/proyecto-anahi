@@ -3,11 +3,18 @@
 
 import os, sys
 from PyQt4 import QtCore, QtGui, uic
+import PyQt4.Qwt5 as Qwt
+import Queue
 
 from utils.adsr import adsrList
 from sensorplayer import SensorPlayer
 from utils.adsrwidget import adsrWidget
 from utils.plotwindow import PlotWindow
+
+from com_monitor import ComMonitorThread
+from eblib.serialutils import full_port_name, enumerate_serial_ports
+from eblib.utils import get_all_from_queue, get_item_from_queue
+from livedatafeed import LiveDataFeed
 
 class mainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -27,6 +34,8 @@ class mainWindow(QtGui.QMainWindow):
         self.sounds = []
 
         self.plotw = PlotWindow()
+        self.plotw.plot.setAxisScale(Qwt.QwtPlot.yLeft, 0, 1024, 1024/8)
+        self.plotw.plot.setAxisScale(Qwt.QwtPlot.xBottom, 0, 20, 20./10)
         self.plotWindowContainer.addWidget(self.plotw)
 
         for curve in 'Entrada d/dT Umbral Salida'.split():
@@ -35,6 +44,12 @@ class mainWindow(QtGui.QMainWindow):
         self._idx = 0
 
         self.plotw.show()
+
+        self.timer = QtCore.QTimer()
+
+        self.open_port()
+
+        self.test_plot()
 
     @QtCore.pyqtSlot()
     def on_sensorAdd_clicked(self):
@@ -106,18 +121,13 @@ class mainWindow(QtGui.QMainWindow):
     def on_sensorList_currentRowChanged(self, row):
         self.connect_adsr(self.adsrList[row])
 
-    def clear_plot(self):
-        data = [ [0] ] * 5
-        self.plotw.samples = data
-        self.plotw.replot()
-
     def connect_adsr(self, adsr=None):
         if self.monitor_adsr:
             if adsr is not None and adsr is not self.current_adsr:
                 if self.current_adsr:
                     self.current_adsr.internal_state_changed.disconnect(self.adsr_internal_cb)
                 self.current_adsr = adsr
-                self.clear_plot()
+                self.plotw.clear()
                 self._idx = 0
                 self.current_adsr.internal_state_changed.connect(self.adsr_internal_cb)
         else:
@@ -126,12 +136,40 @@ class mainWindow(QtGui.QMainWindow):
 
     def adsr_internal_cb(self, *args, **kwargs):
         salida, trig, entrada, dx = args
-        idx = self._idx + 1
+        idx = self._idx + .1
         self._idx = idx
-        self.plotw.add_datapoint(idx, entrada, dx, self.adsrList.umbral, salida)
+        self.plotw.add_datapoint(idx, entrada, abs(dx), self.adsrList.umbral, salida)
 
     def open_port(self):
-        pass
+        self.data_q = Queue.Queue()
+        self.error_q = Queue.Queue()
+        self.com_monitor = ComMonitorThread(
+            self.data_q,
+            self.error_q,
+            '/dev/ttyACM0',
+            115200)
+        self.com_monitor.start()
+        com_error = get_item_from_queue(self.error_q)
+        if com_error is not None:
+            QtGui.QMessageBox.critical(self, 'ComMonitorThread error',
+                com_error)
+            self.com_monitor = None
+
+        self.monitor_active = True
+
+        self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.on_timer)
+
+        self.timer.start(1000.0 / 10)
+
+    def on_timer(self, *args):
+        data = list(get_all_from_queue(self.data_q))
+        # (timestamp, [x0, x1, x2, etc])
+        if (len(data)==0):
+            return
+
+        for row in data:
+           for idx in xrange(min(len(row[1]), len(self.players))):
+                self.players[idx].adsr(row[1][idx])
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
